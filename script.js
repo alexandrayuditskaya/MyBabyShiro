@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function startGame() {
         gameCanvas.style.display = "block";
-        playGameBtn.style.display = "none";
+        playGameBtn.style.visibility = "hidden";  
         bird.y = 150;
         bird.velocity = 0;
         pipes = [];
@@ -30,22 +30,10 @@ document.addEventListener("DOMContentLoaded", function () {
         setInterval(() => {
             if (gameRunning) {
                 let pipeHeight = Math.floor(Math.random() * (200 - 100) + 100);
-                console.log("Spawning Pipe!"); 
-                pipes.push({ x: gameCanvas.width, y: 0, width: 50, height: pipeHeight });
-                pipes.push({ x: gameCanvas.width, y: pipeHeight + 100, width: 50, height: gameCanvas.height - pipeHeight - 100 });
-                function spawnPipes() {
-    setInterval(() => {
-        if (gameRunning) {
-            let pipeHeight = Math.floor(Math.random() * (200 - 100) + 100);
+                let gapSize = 150;
 
-            let gapSize = 150; 
-
-            pipes.push({ x: gameCanvas.width, y: 0, width: 50, height: pipeHeight });
-
-            pipes.push({ x: gameCanvas.width, y: pipeHeight + gapSize, width: 50, height: gameCanvas.height - pipeHeight - gapSize });
-        }
-    }, 2000);
-}
+                pipes.push({ x: gameCanvas.width, y: 0, width: 50, height: pipeHeight, passed: false }); 
+                pipes.push({ x: gameCanvas.width, y: pipeHeight + gapSize, width: 50, height: gameCanvas.height - pipeHeight - gapSize, passed: false });
             }
         }, 2000);
     }
@@ -58,8 +46,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         pipes.forEach(pipe => {
             pipe.x -= 3;
+
+            if (!pipe.passed && pipe.x + pipe.width < bird.x) {
+                score++;
+                pipe.passed = true; 
+            }
         });
-        
+
         pipes = pipes.filter(pipe => pipe.x > -50);
 
         pipes.forEach(pipe => {
@@ -80,9 +73,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function gameOver() {
         gameRunning = false;
-        alert(`Game Over! Score: ${score}`);
-        playGameBtn.style.display = "block";
-        gameCanvas.style.display = "none";
+        setTimeout(() => {
+            alert(`Game Over! Your Score: ${score}`); 
+            playGameBtn.style.visibility = "visible";
+            gameCanvas.style.display = "none";
+        }, 200);
     }
 
     function gameLoop() {
